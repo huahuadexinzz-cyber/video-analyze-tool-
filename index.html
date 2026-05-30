@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>短视频智能分析工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        dark: '#1D2939',
+                        light: '#F9FAFB'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto { content-visibility: auto; }
+            .text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            .bg-gradient-primary { background: linear-gradient(135deg, #165DFF 0%, #0EA5E9 100%); }
+            .hover-scale { transition: transform 0.3s ease; }
+            .hover-scale:hover { transform: scale(1.03); }
+        }
+    </style>
+</head>
+<body class="bg-light text-dark min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i class="fa fa-video-camera text-primary text-2xl"></i>
+                <h1 class="text-xl font-bold text-primary hidden sm:block">短视频智能分析工具</h1>
+            </div>
+            <nav class="flex items-center gap-6">
+                <a href="#" class="text-dark hover:text-primary transition-colors hidden sm:block">首页</a>
+                <a href="#" class="text-dark hover:text-primary transition-colors hidden sm:block">功能</a>
+                <a href="#" class="text-dark hover:text-primary transition-colors hidden sm:block">使用教程</a>
+                <button id="loginBtn" class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors">
+                    <i class="fa fa-user mr-1"></i> 登录
+                </button>
+            </nav>
+            <button class="sm:hidden text-dark text-xl">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- 英雄区域 -->
+        <section class="text-center mb-16">
+            <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark mb-4 leading-tight">
+                一键解析短视频，<br>生成<span class="text-primary">逐字稿</span>与<span class="text-primary">AI总结</span>
+            </h2>
+            <p class="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
+                只需粘贴视频链接，自动提取语音转文字，智能总结核心内容，节省80%观看时间
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                <div class="relative w-full sm:w-auto">
+                    <input 
+                        id="videoUrl"
+                        type="text" 
+                        placeholder="粘贴抖音/快手/B站等短视频链接..." 
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    >
+                    <button id="analyzeBtn" class="bg-gradient-primary text-white px-6 py-3 rounded-lg absolute right-0 top-0 h-full hover:opacity-90 transition-opacity">
+                        <i class="fa fa-magic mr-2"></i> 开始分析
+                    </button>
+                </div>
+            </div>
+            <p class="text-gray-500 text-sm mt-4">支持抖音、快手、B站、小红书等主流平台</p>
+        </section>
+
+        <!-- 功能展示 -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div class="bg-white rounded-xl shadow-md p-6 hover-scale">
+                <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <i class="fa fa-link text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">多平台链接解析</h3>
+                <p class="text-gray-600">支持主流短视频平台链接解析，无需下载APP，直接在线分析</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6 hover-scale">
+                <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <i class="fa fa-file-text-o text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">精准语音转文字</h3>
+                <p class="text-gray-600">先进ASR技术，自动识别视频语音内容，生成完整逐字稿，准确率高达98%</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6 hover-scale">
+                <div class="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                    <i class="fa fa-lightbulb-o text-primary text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">AI智能总结</h3>
+                <p class="text-gray-600">基于大语言模型，提炼视频核心观点，生成3-5条关键摘要，快速掌握重点</p>
+            </div>
+        </section>
+
+        <!-- 操作演示 -->
+        <section class="bg-white rounded-xl shadow-md p-8 mb-16">
+            <h3 class="text-2xl font-bold text-center mb-8">三步快速分析短视频</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-primary text-xl font-bold">1</span>
+                    </div>
+                    <h4 class="text-lg font-semibold mb-2">粘贴视频链接</h4>
+                    <p class="text-gray-600 text-sm">复制短视频平台链接，粘贴到输入框</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-primary text-xl font-bold">2</span>
+                    </div>
+                    <h4 class="text-lg font-semibold mb-2">一键分析</h4>
+                    <p class="text-gray-600 text-sm">点击开始分析，系统自动处理视频内容</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-primary text-xl font-bold">3</span>
+                    </div>
+                    <h4 class="text-lg font-semibold mb-2">查看结果</h4>
+                    <p class="text-gray-600 text-sm">获取逐字稿和AI总结，支持复制导出</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 结果展示区 (默认隐藏) -->
+        <section id="resultSection" class="bg-white rounded-xl shadow-md p-8 mb-16 hidden">
+            <h3 class="text-2xl font-bold mb-6 flex items-center">
+                <i class="fa fa-check-circle text-primary mr-2"></i> 分析结果
+            </h3>
+            
+            <!-- 视频信息 -->
+            <div class="flex flex-col md:flex-row gap-6 mb-8">
+                <div class="w-full md:w-1/3 bg-gray-100 rounded-lg overflow-hidden">
+                    <img id="videoThumbnail" src="https://picsum.photos/400/225" alt="视频缩略图" class="w-full h-48 object-cover">
+                </div>
+                <div class="w-full md:w-2/3">
+                    <h4 id="videoTitle" class="text-xl font-bold mb-2">视频标题</h4>
+                    <p id="videoMeta" class="text-gray-600 text-sm mb-4">发布时间: 2026-05-29 | 时长: 03:45 | 平台: 抖音</p>
+                    <div class="flex gap-3">
+                        <button class="bg-primary/10 text-primary px-3 py-1 rounded text-sm flex items-center">
+                            <i class="fa fa-download mr-1"></i> 下载视频
+                        </button>
+                        <button class="bg-primary/10 text-primary px-3 py-1 rounded text-sm flex items-center">
+                            <i class="fa fa-file-audio-o mr-1"></i> 下载音频
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 内容标签页 -->
+            <div class="border-b border-gray-200 mb-4">
+                <div class="flex gap-2">
+                    <button id="transcriptTab" class="px-4 py-2 font-medium text-primary border-b-2 border-primary">
+                        完整逐字稿
+                    </button>
+                    <button id="summaryTab" class="px-4 py-2 font-medium text-gray-500 hover:text-primary transition-colors">
+                        AI总结
+                    </button>
+                </div>
+            </div>
+
+            <!-- 逐字稿内容 -->
+            <div id="transcriptContent" class="mb-6">
+                <div class="bg-gray-50 p-4 rounded-lg mb-4 max-h-60 overflow-y-auto">
+                    <p id="transcriptText" class="text-gray-700 leading-relaxed">
+                        正在生成逐字稿...请稍候
+                    </p>
+                </div>
+                <button class="text-primary hover:text-primary/80 flex items-center">
+                    <i class="fa fa-copy mr-1"></i> 复制逐字稿
+                </button>
+            </div>
+
+            <!-- AI总结内容 (默认隐藏) -->
+            <div id="summaryContent" class="mb-6 hidden">
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <ul id="summaryList" class="text-gray-700 space-y-2">
+                        <li class="flex items-start">
+                            <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                            <span>正在生成AI总结...请稍候</span>
+                        </li>
+                    </ul>
+                </div>
+                <button class="text-primary hover:text-primary/80 flex items-center">
+                    <i class="fa fa-copy mr-1"></i> 复制总结
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa fa-video-camera text-primary text-2xl"></i>
+                        <h3 class="text-xl font-bold">短视频智能分析工具</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        让短视频内容分析更高效，助力信息获取与知识沉淀
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">快速链接</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-primary transition-colors">首页</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">功能介绍</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">使用教程</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">常见问题</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">联系我们</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-center gap-2">
+                            <i class="fa fa-envelope-o"></i>
+                            <span>support@example.com</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa fa-weixin"></i>
+                            <span>短视频分析助手</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500 text-sm">
+                © 2026 短视频智能分析工具 | 保留所有权利
+            </div>
+        </div>
+    </footer>
+
+    <!-- 登录弹窗 (默认隐藏) -->
+    <div id="loginModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">用户登录</h3>
+                <button id="closeModalBtn" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+                    <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" required>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                    <input type="password" id="password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="rememberMe" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                        <label for="rememberMe" class="ml-2 block text-sm text-gray-700">记住我</label>
+                    </div>
+                    <a href="#" class="text-sm text-primary hover:text-primary/80">忘记密码?</a>
+                </div>
+                <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    登录
+                </button>
+                <div class="text-center text-sm text-gray-600">
+                    还没有账号? <a href="#" class="text-primary hover:text-primary/80">立即注册</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 分析中弹窗 (默认隐藏) -->
+    <div id="loadingModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-8 max-w-sm w-full text-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
+            <h3 class="text-xl font-bold mb-2">正在分析视频...</h3>
+            <p class="text-gray-600 text-sm">请稍候，我们正在处理您的视频内容</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM元素
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const videoUrlInput = document.getElementById('videoUrl');
+        const resultSection = document.getElementById('resultSection');
+        const transcriptTab = document.getElementById('transcriptTab');
+        const summaryTab = document.getElementById('summaryTab');
+        const transcriptContent = document.getElementById('transcriptContent');
+        const summaryContent = document.getElementById('summaryContent');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginModal = document.getElementById('loginModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const loginForm = document.getElementById('loginForm');
+        const loadingModal = document.getElementById('loadingModal');
+        const transcriptText = document.getElementById('transcriptText');
+        const summaryList = document.getElementById('summaryList');
+        const videoTitle = document.getElementById('videoTitle');
+        const videoMeta = document.getElementById('videoMeta');
+        const videoThumbnail = document.getElementById('videoThumbnail');
+
+        // 标签页切换
+        transcriptTab.addEventListener('click', () => {
+            transcriptTab.classList.add('text-primary', 'border-b-2', 'border-primary');
+            transcriptTab.classList.remove('text-gray-500');
+            summaryTab.classList.add('text-gray-500');
+            summaryTab.classList.remove('text-primary', 'border-b-2', 'border-primary');
+            transcriptContent.classList.remove('hidden');
+            summaryContent.classList.add('hidden');
+        });
+
+        summaryTab.addEventListener('click', () => {
+            summaryTab.classList.add('text-primary', 'border-b-2', 'border-primary');
+            summaryTab.classList.remove('text-gray-500');
+            transcriptTab.classList.add('text-gray-500');
+            transcriptTab.classList.remove('text-primary', 'border-b-2', 'border-primary');
+            summaryContent.classList.remove('hidden');
+            transcriptContent.classList.add('hidden');
+        });
+
+        // 登录弹窗
+        loginBtn.addEventListener('click', () => {
+            loginModal.classList.remove('hidden');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            loginModal.classList.add('hidden');
+        });
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // 模拟登录成功
+            alert('登录成功！');
+            loginModal.classList.add('hidden');
+        });
+
+        // 点击模态框外部关闭
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.add('hidden');
+            }
+        });
+
+        // 分析按钮点击事件
+        analyzeBtn.addEventListener('click', () => {
+            const url = videoUrlInput.value.trim();
+            if (!url) {
+                alert('请输入视频链接');
+                return;
+            }
+
+            // 显示加载弹窗
+            loadingModal.classList.remove('hidden');
+            
+            // 模拟API请求延迟
+            setTimeout(() => {
+                // 隐藏加载弹窗
+                loadingModal.classList.add('hidden');
+                
+                // 显示结果区域
+                resultSection.classList.remove('hidden');
+                
+                // 填充模拟数据
+                videoTitle.textContent = '2026年最新AI工具推荐，提高工作效率10倍';
+                videoMeta.textContent = '发布时间: 2026-05-28 | 时长: 05:23 | 平台: 抖音';
+                videoThumbnail.src = 'https://picsum.photos/seed/video1/400/225';
+                
+                // 填充模拟逐字稿
+                transcriptText.innerHTML = `
+                    大家好，欢迎收看今天的视频，我是你们的主持人小明。今天我要给大家推荐几款2026年最新的AI工具，这些工具能够帮助我们提高工作效率，让我们的工作变得更加轻松。<br><br>
+                    第一款工具是AI写作助手，这款工具能够根据你的需求自动生成各种类型的文本内容，包括文章、报告、邮件等。它支持多种语言，而且生成的内容质量非常高，几乎可以达到人类写作的水平。<br><br>
+                    第二款工具是AI设计工具，这款工具能够帮助设计师快速创建各种设计作品，包括海报、Logo、网页设计等。它内置了大量的模板和素材，你只需要简单修改就可以生成专业的设计作品。<br><br>
+                    第三款工具是AI视频编辑工具，这款工具能够自动剪辑视频，添加字幕、特效等。它支持智能识别视频内容，自动生成精彩片段，让视频编辑变得更加简单高效。<br><br>
+                    以上就是我今天给大家推荐的三款AI工具，希望对大家有所帮助。如果大家有其他好用的AI工具，欢迎在评论区留言分享。谢谢大家的观看，我们下期再见！
+                `;
+                
+                // 填充模拟AI总结
+                summaryList.innerHTML = `
+                    <li class="flex items-start">
+                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                        <span>视频推荐了3款2026年最新AI工具：AI写作助手、AI设计工具、AI视频编辑工具</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                        <span>AI写作助手可生成多语言文本内容，质量接近人类写作水平</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                        <span>AI设计工具内置大量模板素材，助力快速创建专业设计作品</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                        <span>AI视频编辑工具支持智能识别内容，自动剪辑并添加字幕特效</span>
+                    </li>
+                `;
+                
+                // 切换到逐字稿标签
+                transcriptTab.click();
+                
+                // 滚动到结果区域
+                resultSection.scrollIntoView({ behavior: 'smooth' });
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
